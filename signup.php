@@ -1,113 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>SIGNUP PAGE</title>
-    <!-- meta tags -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="keywords" content="Art Sign Up Form Responsive Widget, Audio and Video players, Login Form Web Template, Flat Pricing Tables, Flat Drop-Downs, Sign-Up Web Templates,
-		Flat Web Templates, Login Sign-up Responsive Web Template, Smartphone Compatible Web Template, Free Web Designs for Nokia, Samsung, LG, Sony Ericsson, Motorola Web Design"
-    />
-    <!-- /meta tags -->
-    <!-- custom style sheet -->
-    <link href="web/css/style.css" rel="stylesheet" type="text/css" />
-    <!-- /custom style sheet -->
-    <!-- fontawesome css -->
-    <link href="web/css/fontawesome-all.css" rel="stylesheet" />
-    <!-- /fontawesome css -->
-    <!-- google fonts-->
-    <link href="//fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-    <!-- /google fonts-->
-
+  <title>Create Account — HostelEase</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="web/css/fontawesome-all.css" rel="stylesheet" />
+  <link href="web/css/style.css" rel="stylesheet" />
 </head>
-
-
 <body>
-    <h1>Hostel Room Allocation System</h1>
-    <div class=" w3l-login-form">
-        <h2>Sign Up Here</h2>
-        <form action="includes/signup.inc.php" method="POST">
 
-            <div class=" w3l-form-group">
-                <label>Student Roll No</label>
-                <div class="group">
-                    <i class="fas fa-id-badge"></i>
-                    <input type="text" class="form-control" name="student_roll_no" placeholder="Roll No" required="required" />
-                </div>
-            </div>
-            <div class=" w3l-form-group">
-                <label>First Name</label>
-                <div class="group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" class="form-control" name="student_fname" placeholder="First Name" required="required" />
-                </div>
-            </div>
-            <div class=" w3l-form-group">
-                <label>Last Name</label>
-                <div class="group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" class="form-control" name="student_lname" placeholder="Last Name" required="required" />
-                </div>
-            </div>
-            <div class=" w3l-form-group">
-                <label>Mobile No</label>
-                <div class="group">
-                    <i class="fas fa-phone"></i>
-                    <input type="text" class="form-control" name="mobile_no" placeholder="Mobile No" required="required" />
-                </div>
-            </div>
-            <div class=" w3l-form-group">
-                <label>Department</label>
-                <div class="group">
-                    <i class="fas fa-graduation-cap"></i>
-                    <input type="text" class="form-control" name="department" placeholder="Department" required="required" />
-                </div>
-            </div>
-            <div class=" w3l-form-group">
-                <label>Year of Study</label>
-                <div class="group">
-                    <i class="fas fa-calendar"></i>
-                    <input type="text" class="form-control" name="year_of_study" placeholder="Year of Study" required="required" />
-                </div>
-            </div>
+<div class="he-auth-wrapper">
 
-          <!--  <div class=" w3l-form-group">
-                <label>Email:</label>
-                <div class="group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="text" class="form-control" name="mail" placeholder="Email" required="required" />
-                </div>
-            </div>-->
-
-            <div class=" w3l-form-group">
-                <label>Password:</label>
-                <div class="group">
-                    <i class="fas fa-unlock"></i>
-                    <input type="password" class="form-control" name="pwd" placeholder="Password" required="required" />
-                </div>
-            </div>
-
-            <div class=" w3l-form-group">
-                <label>Confirm Password:</label>
-                <div class="group">
-                    <i class="fas fa-unlock"></i>
-                    <input type="password" class="form-control" name="confirmpwd" placeholder="Confirm Password" required="required" />
-                </div>
-            </div>
-            <!--<div class="forgot">
-                <a href="#">Forgot Password?</a>
-                <p><input type="checkbox">Remember Me</p>
-            </div>-->
-            <button type="submit" name="signup-submit">Sign Up</button>
-        </form>
-        <p class=" w3l-register-p">Already a member?<a href="index.php" class="register"> Login</a></p>
+  <!-- Left Panel -->
+  <div class="he-auth-left">
+    <div style="font-size:4rem; margin-bottom:1.2rem;">🌸</div>
+    <h1 class="hero-title">Join HostelEase</h1>
+    <p class="hero-sub">Register to apply for a hostel room, track your allocation, and stay connected with your warden.</p>
+    <div class="he-feature-pills">
+      <span class="he-pill">📝 Easy registration</span>
+      <span class="he-pill">🛏️ Room apply</span>
+      <span class="he-pill">✅ Instant status</span>
+      <span class="he-pill">📞 24/7 support</span>
     </div>
-    <footer>
-        <p class="copyright-agileinfo"> &copy; 2018 DBMS Project. All Rights Reserved | Design by <a href="https://www.linkedin.com/in/bharat-reddy/">Bharat-Prajwal-Rakesh</a></p>
-    </footer>
+  </div>
+
+  <!-- Signup Card -->
+  <div class="he-auth-card" style="overflow-y:auto; max-height:100vh;">
+
+    <div style="margin-bottom:1.5rem;">
+      <div class="he-brand" style="margin-bottom:0.8rem;">
+        <div class="brand-icon"><i class="fas fa-home"></i></div>
+        Hostel<span>Ease</span>
+      </div>
+      <h2>Create your account ✨</h2>
+      <p class="subtitle">Fill in your details to get started</p>
+    </div>
+
+    <?php if(isset($_GET['error'])): ?>
+      <div class="he-alert he-alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <?php
+          $err = $_GET['error'];
+          if($err === 'pwdDontMatch')  echo 'Passwords do not match. Please try again.';
+          elseif($err === 'userTaken') echo 'This Roll No is already registered.';
+          else                         echo 'Something went wrong. Please try again.';
+        ?>
+      </div>
+    <?php endif; ?>
+
+    <form action="includes/signup.inc.php" method="POST">
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+        <div class="he-form-group">
+          <label>First Name</label>
+          <div class="he-input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" name="student_fname" placeholder="First name" required />
+          </div>
+        </div>
+        <div class="he-form-group">
+          <label>Last Name</label>
+          <div class="he-input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" name="student_lname" placeholder="Last name" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="he-form-group">
+        <label>Student Roll No</label>
+        <div class="he-input-wrap">
+          <i class="fas fa-id-badge"></i>
+          <input type="text" name="student_roll_no" placeholder="e.g. P03AC24S126032" required />
+        </div>
+      </div>
+
+      <div class="he-form-group">
+        <label>Mobile Number</label>
+        <div class="he-input-wrap">
+          <i class="fas fa-phone"></i>
+          <input type="tel" name="mobile_no" placeholder="+91 XXXXXXXXXX" required />
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+        <div class="he-form-group">
+          <label>Department</label>
+          <div class="he-input-wrap">
+            <i class="fas fa-graduation-cap"></i>
+            <input type="text" name="department" placeholder="e.g. MCA" required />
+          </div>
+        </div>
+        <div class="he-form-group">
+          <label>Year of Study</label>
+          <div class="he-input-wrap">
+            <i class="fas fa-calendar-alt"></i>
+            <input type="text" name="year_of_study" placeholder="e.g. III" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="he-form-group">
+        <label>Password</label>
+        <div class="he-input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="pwd" placeholder="Create a strong password" required />
+        </div>
+      </div>
+
+      <div class="he-form-group">
+        <label>Confirm Password</label>
+        <div class="he-input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="confirmpwd" placeholder="Repeat your password" required />
+        </div>
+      </div>
+
+      <button type="submit" name="signup-submit" class="he-btn he-btn-primary" style="margin-top:0.4rem;">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+
+    </form>
+
+    <p class="he-register-link" style="margin-top:1rem;">
+      Already have an account? <a href="index.php">Sign in here</a>
+    </p>
+
+  </div>
+</div>
+
+<footer class="he-footer">
+  <p>&copy; <?php echo date('Y'); ?> HostelEase &mdash; Administrative Management College, Bangalore.</p>
+</footer>
 
 </body>
-
 </html>

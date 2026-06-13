@@ -1,59 +1,37 @@
 <?php
+require 'config.inc.php';
 
 if (isset($_POST['login-submit'])) {
 
-  require 'config.inc.php';
+    $roll = trim($_POST['student_roll_no']);
+    $pwd  = trim($_POST['pwd']);
 
-  $roll = $_POST['student_roll_no'];
-  $password = $_POST['pwd'];
+    // Check if student exists
+    $stmt = $conn->prepare("SELECT * FROM students WHERE student_roll_no = ?");
+    $stmt->bind_param("s", $roll);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-  if (empty($roll) || empty($password)) {
-    header("Location: ../index.php?error=emptyfields");
+    if ($result->num_rows === 0) {
+        header("Location: ../index.php?error=noUser");
+        exit();
+    }
+
+    $student = $result->fetch_assoc();
+
+    // Verify password
+    if (!password_verify($pwd, $student['pwd'])) {
+        header("Location: ../index.php?error=wrongPassword");
+        exit();
+    }
+
+    // Set session and redirect
+    $_SESSION['roll']  = $student['student_roll_no'];
+    $_SESSION['fname'] = $student['student_fname'];
+    header("Location: ../home.php");
     exit();
-  }
-  else {
-    $sql = "SELECT *FROM Student WHERE Student_id = '$roll'";
-    $result = mysqli_query($conn, $sql);
-    if($row = mysqli_fetch_assoc($result)){
-      $pwdCheck = password_verify($password, $row['Pwd']);
-      if($pwdCheck == false){
-        header("Location: ../index.php?error=wrongpwd");
-        exit();
-      }
-      else if($pwdCheck == true) {
-
-        //session_start();
-        $_SESSION['roll'] = $row['Student_id'];
-        $_SESSION['fname'] = $row['Fname'];
-        $_SESSION['lname'] = $row['Lname'];
-        $_SESSION['mob_no'] = $row['Mob_no'];
-        $_SESSION['department'] = $row['Dept'];
-        $_SESSION['year_of_study'] = $row['Year_of_study'];
-        $_SESSION['hostel_id'] = $row['Hostel_id'];
-        $_SESSION['room_id'] = $row['Room_id'];
-        if(isset($_SESSION['department'])){
-          echo "<script type='text/javascript'>alert('Set')</script>";
-        }
-        else {
-          echo "<script type='text/javascript'>alert('Not SET')</script>";
-        }
-        //echo $_SESSION['lname'];
-        header("Location: ../home.php?login=success");
-        //exit();
-      }
-      else {
-        header("Location: ../index.php?error=strangeerr");
-        exit();
-      }
-    }
-    else{
-      header("Location: ../index.php?error=nouser");
-      exit();
-    }
-  }
-
 }
-else {
-  header("Location: ../index.php");
-  exit();
-}
+
+header("Location: ../index.php");
+exit();
+?>

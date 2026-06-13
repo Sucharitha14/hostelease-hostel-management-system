@@ -1,205 +1,84 @@
 <?php
+require 'includes/config.inc.php';
+if (!isset($_SESSION['roll'])) { header("Location: index.php"); exit(); }
+$roll = $_SESSION['roll'];
 
- require 'includes/config.inc.php';
+$stmt = $conn->prepare("SELECT * FROM messages WHERE student_roll_no = ? ORDER BY sent_at DESC");
+$stmt->bind_param("s", $roll); $stmt->execute();
+$messages = $stmt->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title> Intrend Interior Category Flat Bootstrap Responsive Website Template | Contact : W3layouts</title>
-	
-	<!-- Meta tag Keywords -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta charset="utf-8">
-	<meta name="keywords" content="Intrend Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
-	Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
-	<script type="application/x-javascript">
-		addEventListener("load", function () {
-			setTimeout(hideURLbar, 0);
-		}, false);
-
-		function hideURLbar() {
-			window.scrollTo(0, 1);
-		}
-	</script>
-	<!--// Meta tag Keywords -->
-		
-	<!-- css files -->
-	<link rel="stylesheet" href="web_home/css_home/bootstrap.css"> <!-- Bootstrap-Core-CSS -->
-	<link rel="stylesheet" href="web_home/css_home/style.css" type="text/css" media="all" /> <!-- Style-CSS --> 
-	<link rel="stylesheet" href="web_home/css_home/fontawesome-all.css"> <!-- Font-Awesome-Icons-CSS -->
-	<!-- //css files -->
-	
-	<!-- web-fonts -->
-	<link href="//fonts.googleapis.com/css?family=Poiret+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
-	<!-- //web-fonts -->
-	
+  <title>My Messages — HostelEase</title>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="web/css/fontawesome-all.css" rel="stylesheet" />
+  <link href="web/css/style.css" rel="stylesheet" />
+  <style>
+    .msg-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.3rem; margin-bottom:1rem; }
+    .msg-bubble { background:#fdf2f8; border-radius:0 var(--radius) var(--radius) var(--radius); padding:0.8rem 1rem; font-size:0.9rem; color:var(--text-mid); margin:0.5rem 0; }
+    .reply-bubble { background:#ede9fe; border-radius:var(--radius) 0 var(--radius) var(--radius); padding:0.8rem 1rem; font-size:0.9rem; color:#4c1d95; margin:0.5rem 0; }
+  </style>
 </head>
-<style type="text/css">
-	.card-header{
-		padding: 15px;
-		font-size: 30px;
-	}
-	.card-body{
-		padding: 15px;
-	}
-	.card-footer{
-		text-align: left;
-		padding: 15px;
-	}
-</style>
-
 <body>
+<div class="he-page">
+  <nav class="he-navbar">
+    <div class="he-brand"><div class="brand-icon"><i class="fas fa-home"></i></div>Hostel<span>Ease</span></div>
+    <ul class="he-nav-links">
+      <li><a href="home.php"><i class="fas fa-th-large" style="margin-right:5px"></i>Dashboard</a></li>
+      <li><a href="services.php"><i class="fas fa-door-open" style="margin-right:5px"></i>Hostels</a></li>
+      <li><a href="application_form.php"><i class="fas fa-file-alt" style="margin-right:5px"></i>Apply</a></li>
+      <li><a href="contact.php"><i class="fas fa-envelope" style="margin-right:5px"></i>Contact</a></li>
+      <li><a href="message_user.php" class="active"><i class="fas fa-bell" style="margin-right:5px"></i>Messages</a></li>
+    </ul>
+    <div class="he-nav-user">
+      <div class="he-dropdown">
+        <div class="he-avatar"><?php echo strtoupper(substr($roll,0,2)); ?></div>
+        <div class="he-dropdown-menu">
+          <a href="profile.php"><i class="fas fa-user" style="margin-right:8px;color:var(--primary)"></i>My Profile</a>
+          <hr>
+          <a href="includes/logout.inc.php"><i class="fas fa-sign-out-alt" style="margin-right:8px;color:var(--danger)"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-<!-- banner -->
-<div class="inner-page-banner" id="home"> 	   
-	<!--Header-->
-	<header>
-		<div class="container agile-banner_nav">
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
-				
-				<h1><a class="navbar-brand" href="home.php">NITC <span class="display"></span></a></h1>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-				</button>
+  <main class="he-main">
+    <p class="he-section-title">My Messages</p>
 
-				<div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-					<ul class="navbar-nav ml-auto">
-						<li class="nav-item">
-							<a class="nav-link" href="home.php">Home <span class="sr-only">(current)</span></a>
-						</li>
-						
-						<li class="nav-item">
-							<a class="nav-link" href="services.php">Hostels</a>
-						</li>
-						<li class="nav-item active">
-							<a class="nav-link" href="contact.php">Contact</a>
-						</li>
-						<li class="nav-item">
-						<a class="nav-link" href="message_user.php">Message Received</a>
-					</li>
-						<li class="dropdown nav-item">
-						<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown"><?php echo $_SESSION['roll']; ?>
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu agile_short_dropdown">
-							<li>
-								<a href="profile.php">My Profile</a>
-							</li>
-							<li>
-								<a href="includes/logout.inc.php">Logout</a>
-							</li>
-						</ul>
-					</li>
-					</ul>
-				</div>
-			  
-			</nav>
-		</div>
-	</header>
-	<!--Header-->
+    <?php if($messages && $messages->num_rows > 0):
+      while($msg = $messages->fetch_assoc()): ?>
+    <div class="msg-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+        <span style="font-size:0.82rem;font-weight:700;color:var(--text-mid);">
+          <i class="fas fa-user" style="color:var(--primary);margin-right:4px;"></i> You
+        </span>
+        <small style="color:var(--text-light);"><?php echo date('d M Y, h:i A', strtotime($msg['sent_at'])); ?></small>
+      </div>
+      <div class="msg-bubble"><?php echo htmlspecialchars($msg['message']); ?></div>
+
+      <?php if($msg['reply']): ?>
+        <div style="font-size:0.82rem;font-weight:700;color:var(--secondary);margin-top:0.8rem;margin-bottom:0.3rem;">
+          <i class="fas fa-user-shield" style="margin-right:4px;"></i> Warden replied:
+        </div>
+        <div class="reply-bubble"><?php echo htmlspecialchars($msg['reply']); ?></div>
+      <?php else: ?>
+        <div class="he-alert he-alert-warn" style="margin-top:0.8rem;padding:0.5rem 1rem;font-size:0.82rem;">
+          <i class="fas fa-clock"></i> Awaiting reply from warden...
+        </div>
+      <?php endif; ?>
+    </div>
+    <?php endwhile; else: ?>
+      <div class="he-alert he-alert-info">
+        <i class="fas fa-inbox"></i> No messages yet. <a href="contact.php">Send a message to the warden →</a>
+      </div>
+    <?php endif; ?>
+  </main>
+
+  <footer class="he-footer">
+    <p>&copy; <?php echo date('Y'); ?> HostelEase — Administrative Management College, Bangalore.</p>
+  </footer>
 </div>
-<!-- //banner --> 
-
-<?php
-    $roll_no = $_SESSION['roll'];
-    $query = "SELECT * FROM Message WHERE receiver_id ='$roll_no'";
-    $result = mysqli_query($conn,$query);
-
-    while ($row = mysqli_fetch_assoc($result)){  
-    	$hostel_id = $row['hostel_id'];
-    	$query6 = "SELECT * FROM Hostel WHERE Hostel_id = '$hostel_id'";
-       $result6 = mysqli_query($conn,$query6);
-       $row6 = mysqli_fetch_assoc($result6);
-       $hostel_name = $row6['Hostel_name'];
-          ?> 
-
-    <div class="container">
-      <div class="card">
-      <div class="card-header"><b><?php echo $row['subject_h']; ?></b></div>
-      <div class="card-body"><?php echo $row['message']; ?></div> 
-      <div class="card-footer"><?php echo $hostel_name." Hostel Manager"; ?><span style="float: right"><?php echo $row['msg_date']." ".$row['msg_time']; ?></span></div>
-  </div>
-</div>
-<br><br>
-             
-    <?php
-    } 
-
-?>
-
-<br>
-<br>
-
-<!-- footer -->
-<footer class="py-5">
-	<div class="container py-md-5">
-		<div class="footer-logo mb-5 text-center">
-			<a class="navbar-brand" href="http://www.nitc.ac.in/" target="_blank">NIT <span class="display"> CALICUT</span></a>
-		</div>
-		<div class="footer-grid">
-			
-			<div class="list-footer">
-				<ul class="footer-nav text-center">
-					<li>
-						<a href="home.php">Home</a>
-					</li>
-					<li>
-						<a href="services.php">Hostels</a>
-					</li>
-					
-					<li>
-						<a href="contact.php">Contact</a>
-					</li>
-					<li>
-						<a href="profile.php">Profile</a>
-					</li>
-				</ul>
-			</div>
-			
-		</div>
-	</div>
-</footer>
-<!-- footer -->
-
-<!-- js-scripts -->		
-
-	<!-- js -->
-	<script type="text/javascript" src="web_home/js/jquery-2.2.3.min.js"></script>
-	<script type="text/javascript" src="web_home/js/bootstrap.js"></script> <!-- Necessary-JavaScript-File-For-Bootstrap --> 
-	<!-- //js -->
-
-	<!-- start-smoth-scrolling -->
-	<script src="web_home/js/SmoothScroll.min.js"></script>
-	<script type="text/javascript" src="web_home/js/move-top.js"></script>
-	<script type="text/javascript" src="web_home/js/easing.js"></script>
-	<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			$(".scroll").click(function(event){		
-				event.preventDefault();
-				$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
-			});
-		});
-	</script>
-	<!-- here stars scrolling icon -->
-	<script type="text/javascript">
-		$(document).ready(function() {
-			/*
-				var defaults = {
-				containerID: 'toTop', // fading element id
-				containerHoverID: 'toTopHover', // fading element hover id
-				scrollSpeed: 1200,
-				easingType: 'linear' 
-				};
-			*/
-								
-			$().UItoTop({ easingType: 'easeOutQuart' });
-								
-			});
-	</script>
-	<!-- //here ends scrolling icon -->
-	<!-- start-smoth-scrolling -->
-	
-<!-- //js-scripts -->
-
 </body>
 </html>

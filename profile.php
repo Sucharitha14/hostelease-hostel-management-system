@@ -1,326 +1,106 @@
 <?php
-		  require 'includes/config.inc.php';
- ?>
+require 'includes/config.inc.php';
+if (!isset($_SESSION['roll'])) { header("Location: index.php"); exit(); }
+$roll = $_SESSION['roll'];
+
+$stmt = $conn->prepare("SELECT * FROM students WHERE student_roll_no = ?");
+$stmt->bind_param("s", $roll); $stmt->execute();
+$student = $stmt->get_result()->fetch_assoc();
+
+$stmt2 = $conn->prepare("SELECT * FROM room_details WHERE student_roll_no = ?");
+$stmt2->bind_param("s", $roll); $stmt2->execute();
+$room = $stmt2->get_result()->fetch_assoc();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>User Profile</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Consultancy Profile Widget Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template,
-Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
-<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
-		function hideURLbar(){ window.scrollTo(0,1); } </script>
-<!-- js -->
-<script src="web_profile/js/jquery-2.1.3.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="web_profile/js/sliding.form.js"></script>
-<!-- //js -->
-<link href="web_profile/css/style.css" rel="stylesheet" type="text/css" media="all" />
-<link rel="stylesheet" href="web_profile/css/font-awesome.min.css" />
-<link rel="stylesheet" href="web_profile/css/smoothbox.css" type='text/css' media="all" />
-<link href="//fonts.googleapis.com/css?family=Pathway+Gothic+One" rel="stylesheet">
-<link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
-
-<script type="application/x-javascript">
-	addEventListener("load", function () {
-		setTimeout(hideURLbar, 0);
-	}, false);
-
-	function hideURLbar() {
-		window.scrollTo(0, 1);
-	}
-</script>
-<!--// Meta tag Keywords -->
-
-<link href="web_home/css_home/slider.css" type="text/css" rel="stylesheet" media="all">
-
-<!-- css files -->
-<link rel="stylesheet" href="web_home/css_home/bootstrap.css"> <!-- Bootstrap-Core-CSS -->
-<link rel="stylesheet" href="web_home/css_home/style.css" type="text/css" media="all" /> <!-- Style-CSS -->
-<link rel="stylesheet" href="web_home/css_home/fontawesome-all.css"> <!-- Font-Awesome-Icons-CSS -->
-<!-- //css files -->
-
-<!-- testimonials css -->
-<link rel="stylesheet" href="web_home/css_home/flexslider.css" type="text/css" media="screen" property="" /><!-- flexslider css -->
-<!-- //testimonials css -->
-
-<!-- web-fonts -->
-<link href="//fonts.googleapis.com/css?family=Poiret+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
-<!-- //web-fonts -->
-
-
+  <title>My Profile — HostelEase</title>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="web/css/fontawesome-all.css" rel="stylesheet" />
+  <link href="web/css/style.css" rel="stylesheet" />
 </head>
 <body>
-	<!-- banner -->
-		<div class="banner" id="home">
-			<div class="cd-radial-slider-wrapper">
+<div class="he-page">
+  <nav class="he-navbar">
+    <div class="he-brand"><div class="brand-icon"><i class="fas fa-home"></i></div>Hostel<span>Ease</span></div>
+    <ul class="he-nav-links">
+      <li><a href="home.php"><i class="fas fa-th-large" style="margin-right:5px"></i>Dashboard</a></li>
+      <li><a href="services.php"><i class="fas fa-door-open" style="margin-right:5px"></i>Hostels</a></li>
+      <li><a href="application_form.php"><i class="fas fa-file-alt" style="margin-right:5px"></i>Apply</a></li>
+      <li><a href="contact.php"><i class="fas fa-envelope" style="margin-right:5px"></i>Contact</a></li>
+      <li><a href="message_user.php"><i class="fas fa-bell" style="margin-right:5px"></i>Messages</a></li>
+    </ul>
+    <div class="he-nav-user">
+      <div class="he-dropdown">
+        <div class="he-avatar"><?php echo strtoupper(substr($student['student_fname'],0,1).substr($student['student_lname'],0,1)); ?></div>
+        <div class="he-dropdown-menu">
+          <a href="profile.php" class="active"><i class="fas fa-user" style="margin-right:8px;color:var(--primary)"></i>My Profile</a>
+          <hr>
+          <a href="includes/logout.inc.php"><i class="fas fa-sign-out-alt" style="margin-right:8px;color:var(--danger)"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-	<!--Header-->
-	<header>
-		<div class="container agile-banner_nav">
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <main class="he-main">
+    <p class="he-section-title">My Profile</p>
 
-				<h1><a class="navbar-brand" href="home.php">NITC <span class="display"></span></a></h1>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-				</button>
+    <div style="max-width:700px;">
+      <!-- Profile Header -->
+      <div class="he-profile-header">
+        <div class="he-profile-avatar">
+          <?php echo strtoupper(substr($student['student_fname'],0,1).substr($student['student_lname'],0,1)); ?>
+        </div>
+        <div>
+          <div class="he-profile-name"><?php echo htmlspecialchars($student['student_fname'].' '.$student['student_lname']); ?></div>
+          <div class="he-profile-sub"><?php echo htmlspecialchars($student['department']); ?> &bull; Year <?php echo htmlspecialchars($student['year_of_study']); ?></div>
+        </div>
+      </div>
 
-				<div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-					<ul class="navbar-nav ml-auto">
-						<li class="nav-item active">
-							<a class="nav-link" href="home.php">Home <span class="sr-only">(current)</span></a>
-						</li>
+      <!-- Profile Details -->
+      <div class="he-profile-body">
+        <p class="he-section-title" style="margin-bottom:1rem;">Personal Details</p>
+        <div class="he-info-grid">
+          <div class="he-info-item"><label>First Name</label><p><?php echo htmlspecialchars($student['student_fname']); ?></p></div>
+          <div class="he-info-item"><label>Last Name</label><p><?php echo htmlspecialchars($student['student_lname']); ?></p></div>
+          <div class="he-info-item"><label>Roll No</label><p><?php echo htmlspecialchars($student['student_roll_no']); ?></p></div>
+          <div class="he-info-item"><label>Mobile</label><p><?php echo htmlspecialchars($student['mobile_no']); ?></p></div>
+          <div class="he-info-item"><label>Department</label><p><?php echo htmlspecialchars($student['department']); ?></p></div>
+          <div class="he-info-item"><label>Year of Study</label><p><?php echo htmlspecialchars($student['year_of_study']); ?></p></div>
+          <div class="he-info-item"><label>Registered On</label><p><?php echo date('d M Y', strtotime($student['created_at'])); ?></p></div>
+        </div>
 
-						<li class="nav-item">
-							<a class="nav-link" href="services.php">Hostels</a>
-						</li>
+        <hr style="border:none;border-top:1px solid var(--border);margin:1.5rem 0;">
 
+        <p class="he-section-title" style="margin-bottom:1rem;">Room Allocation</p>
+        <?php if($room): ?>
+          <div class="he-info-grid">
+            <div class="he-info-item"><label>Room No</label><p><?php echo htmlspecialchars($room['room_no']); ?></p></div>
+            <div class="he-info-item"><label>Hostel</label><p><?php echo htmlspecialchars($room['hostel_name']); ?></p></div>
+            <div class="he-info-item"><label>Room Type</label><p><?php echo htmlspecialchars($room['room_type']); ?></p></div>
+            <div class="he-info-item"><label>Allotted On</label><p><?php echo htmlspecialchars($room['allocation_date']); ?></p></div>
+          </div>
+          <span class="he-badge he-badge-green" style="margin-top:0.8rem;display:inline-block;"><i class="fas fa-check-circle"></i> Room Allocated</span>
+        <?php else: ?>
+          <div class="he-alert he-alert-warn">
+            <i class="fas fa-clock"></i> No room allocated yet.
+            <a href="application_form.php" style="font-weight:700;margin-left:8px;">Apply now →</a>
+          </div>
+        <?php endif; ?>
 
-						<li class="nav-item">
-							<a class="nav-link" href="contact.php">Contact</a>
-						</li>
-						<li class="dropdown nav-item">
-							<!--<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown"><?php echo $_SESSION['roll']; ?>
-								<b class="caret"></b>
-							</a>
-							<ul class="dropdown-menu agile_short_dropdown">
-								<li>
-									<a href="profile.php">My Profile</a>
-								</li>-->
-								<li>
-									<a href="includes/logout.inc.php" class="nav-link">Logout</a>
-								</li>
-							</ul>
-						</li>
-					</ul>
-				</div>
+        <div style="margin-top:1.5rem;">
+          <a href="includes/logout.inc.php" class="he-btn he-btn-outline" style="border-color:var(--danger);color:var(--danger);">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
 
-			</nav>
-		</div>
-	</header>
-	<!--Header-->
-<br><br><br><br><br>
-	<div class="main">
-		<div id="navigation" style="display:none;" class="w3_agile">
-			<ul>
-				<li class="selected">
-					<a href="#"><i class="fa fa-list-ul" aria-hidden="true"></i><span>Info</span></a>
-				</li>
-				<li>
-					<a href="#"><i class="fa fa-folder" aria-hidden="true"></i><span>Hostel</span></a>
-				</li>
-				<li>
-					<a href="#"><i class="fa fa-envelope" aria-hidden="true"></i><span>Contact</span></a>
-				</li>
-			</ul>
-		</div>
-		<div id="wrapper" class="w3ls_wrapper w3layouts_wrapper">
-			<div id="steps" style="margin:0 auto;" class="agileits w3_steps">
-				<form id="formElem" name="formElem" action="#" method="post" class="w3_form w3l_form_fancy">
-					<fieldset class="step agileinfo w3ls_fancy_step">
-						<legend>Personal Info</legend>
-						<div class="abt-agile">
-							<div class="abt-agile-left">
-							</div>
-							<div class="abt-agile-right">
-
-								<h3><?php echo $_SESSION['fname']." ".$_SESSION['lname']; ?></h3>
-								<h5>Student</h5>
-								<ul class="address">
-									<li>
-										<ul class="address-text">
-											<li><b>Roll No </b></li>
-											<li>: <?php echo $_SESSION['roll']; ?></li>
-										</ul>
-									</li>
-									<li>
-										<ul class="address-text">
-											<li><b>PHONE </b></li>
-											<li>: <?php echo $_SESSION['mob_no']; ?></li>
-										</ul>
-									</li>
-									<li>
-										<ul class="address-text">
-											<li><b>DEPT </b></li>
-											<li>: <?php echo $_SESSION['department']; ?></li>
-										</ul>
-									</li>
-									<li>
-										<ul class="address-text">
-											<li><b>YEAR OF STUDY </b></li>
-											<li>: <?php echo $_SESSION['year_of_study']; ?></li>
-										</ul>
-									</li>
-								</ul>
-							</div>
-								<div class="clear"></div>
-						</div>
-				</fieldset>
-				<fieldset class="step agileinfo w3ls_fancy_step">
-					<legend>Hostel Info</legend>
-					<div class="abt-agile">
-						<div class="abt-agile-left-hostel">
-						</div>
-						<div class="abt-agile-right">
-
-							<h3><?php echo $_SESSION['fname']." ".$_SESSION['lname']; ?></h3>
-							<h5>Student</h5>
-							<ul class="address">
-								<li>
-									<ul class="address-text">
-										<li><b>HOSTEL </b></li>
-										<?php
-											$hostelId = $_SESSION['hostel_id'];
-											if($hostelId == NULL){
-												$hostelName = 'None';
-											}
-											else {
-												$sql = "SELECT * FROM Hostel WHERE Hostel_id = '$hostelId'";
-												$result = mysqli_query($conn, $sql);
-												if($row = mysqli_fetch_assoc($result)){
-													$hostelName = $row['Hostel_name'];
-												}
-												else {
-													echo "<script type='text/javascript'>alert('Foreign Key Error-hostenName!!')</script>";
-												}
-											}
-										 ?>
-
-
-										<li>: <?php echo $hostelName; ?></li>
-									</ul>
-								</li>
-								<li>
-									<ul class="address-text">
-										<li><b>ROOM NO </b></li>
-										<?php
-											$roomId = $_SESSION['room_id'];
-											if($hostelId == NULL || $roomId == NULL){
-												$roomNo = 'None';
-											}
-											else {
-												$sql = "SELECT * FROM Room WHERE Room_id = '$roomId'";
-												$result = mysqli_query($conn, $sql);
-												if($row = mysqli_fetch_assoc($result)){
-													$roomNo = $row['Room_No'];
-												}
-												else {
-													echo "<script type='text/javascript'>alert('Foreign Key Error-roomNo!!')</script>";
-												}
-											}
-										 ?>
-										<li>: <?php echo $roomNo; ?></li>
-									</ul>
-								</li>
-							</ul>
-						</div>
-							<div class="clear"></div>
-					</div>
-			</fieldset>
-					<!--	<fieldset class="step wthree">
-						<legend>Work</legend>
-						<div class="work-w3agile">
-							<div class="work-w3agile-top">
-								<div class="agileits_w3layouts_work_grid1 w3layouts_work_grid1 hover14 column">
-									<div class="w3_agile_work_effect">
-										<ul>
-											<li>
-												<a href="web_profile/images/c1.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c1.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-											<li>
-												<a href="web_profile/images/c2.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c2.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-											<li>
-												<a href="web_profile/images/c3.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c3.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-											<li>
-												<a href="web_profile/images/c4.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c4.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-											<li>
-												<a href="web_profile/images/c5.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c5.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-											<li>
-												<a href="web_profile/images/c6.jpg" class="sb" title="Quis Nostrud Exercitation Ullamco Laboris Quis Autem Vel Eum Iure Reprehenderit">
-													<figure>
-														<img src="web_profile/images/c6.jpg" alt=" " class="img-responsive" />
-													</figure>
-												</a>
-											</li>
-												<div class="clear"></div>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</div>
-					</fieldset>-->
-					<fieldset class="step agileinfo w3ls_fancy_step">
-						<legend>Hostel Manager Info</legend>
-						<div class="abt-agile">
-							<div class="abt-agile-left">
-							</div>
-							<div class="abt-agile-right">
-								<?php
-									$Hid = $_SESSION['hostel_id'];
-									$sql1 = "SELECT * FROM Hostel_Manager WHERE Hostel_id = '$Hid'";
-									$result1 = mysqli_query($conn, $sql1);
-									if($row1 = mysqli_fetch_assoc($result1)){
-										$hmfname = $row1['Fname'];
-										$hmlname = $row1['Lname'];
-										$hmMob  = $row1['Mob_no'];
-										$hmemail = $row1['Email'];
-									}
-									else {
-										$hmfname = 'none';
-										$hmlname = 'none';
-										$hmMob  = 'none';
-										$hmemail = 'none';
-									}
-								 ?>
-								<h3><?php echo $hmfname." ".$hmlname; ?></h3>
-								<h5>Admin</h5>
-								<ul class="address">
-									<li>
-										<ul class="address-text">
-											<li><b>PHONE </b></li>
-											<li>: <?php echo $hmMob; ?></li>
-										</ul>
-									</li>
-									<li>
-										<ul class="address-text">
-											<li><b>Email </b></li>
-											<li>: <?php echo $hmemail; ?></li>
-										</ul>
-									</li>
-								</ul>
-							</div>
-								<div class="clear"></div>
-						</div>
-				</fieldset>
-				</form>
-			</div>
-		</div>
-
-	</div>
-	<script type="text/javascript" src="web_profile/js/smoothbox.jquery2.js"></script>
+  <footer class="he-footer">
+    <p>&copy; <?php echo date('Y'); ?> HostelEase — Administrative Management College, Bangalore.</p>
+  </footer>
+</div>
 </body>
 </html>

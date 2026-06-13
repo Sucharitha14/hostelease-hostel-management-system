@@ -29,9 +29,7 @@
 	<link rel="stylesheet" href="web_home/css_home/swipebox.css">
 	<!-- //gallery css -->
 
-	<!-- css files -->
-	<link rel="stylesheet" href="web_home/css_home/bootstrap.css"> <!-- Bootstrap-Core-CSS -->
-	<link rel="stylesheet" href="web_home/css_home/style.css" type="text/css" media="all" /> <!-- Style-CSS -->
+	<!-- css files --> <!-- Bootstrap-Core-CSS --> <!-- Style-CSS -->
 	<link rel="stylesheet" href="web_home/css_home/fontawesome-all.css"> <!-- Font-Awesome-Icons-CSS -->
 	<!-- //css files -->
 

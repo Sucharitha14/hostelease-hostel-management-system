@@ -1,69 +1,51 @@
 <?php
+require 'config.inc.php';
 
 if (isset($_POST['signup-submit'])) {
 
-  require 'config.inc.php';
+    $fname  = trim($_POST['student_fname']);
+    $lname  = trim($_POST['student_lname']);
+    $roll   = trim($_POST['student_roll_no']);
+    $mobile = trim($_POST['mobile_no']);
+    $dept   = trim($_POST['department']);
+    $year   = trim($_POST['year_of_study']);
+    $pwd    = trim($_POST['pwd']);
+    $cpwd   = trim($_POST['confirmpwd']);
 
-  $roll = $_POST['student_roll_no'];
-  $fname = $_POST['student_fname'];
-  $lname = $_POST['student_lname'];
-  $mobile = $_POST['mobile_no'];
-  $dept = $_POST['department'];
-  $year = $_POST['year_of_study'];
-  $password = $_POST['pwd'];
-  $cnfpassword = $_POST['confirmpwd'];
-
-
-  if(!preg_match("/^[a-zA-Z0-9]*$/",$roll)){
-    header("Location: ../signup.php?error=invalidroll");
-    exit();
-  }
-  else if($password !== $cnfpassword){
-    header("Location: ../signup.php?error=passwordcheck");
-    exit();
-  }
-  else {
-
-    $sql = "SELECT Student_id FROM Student WHERE Student_id=?";
-    $stmt = mysqli_stmt_init($conn);
-    if(!mysqli_stmt_prepare($stmt, $sql)){
-      header("Location: ../signup.php?error=sqlerror");
-      exit();
-    }
-    else {
-      mysqli_stmt_bind_param($stmt, "s", $roll);
-      mysqli_stmt_execute($stmt);
-      mysqli_stmt_store_result($stmt);
-      $resultCheck = mysqli_stmt_num_rows($stmt);
-      if ($resultCheck > 0) {
-        header("Location: ../signup.php?error=userexists");
+    // Check passwords match
+    if ($pwd !== $cpwd) {
+        header("Location: ../signup.php?error=pwdDontMatch");
         exit();
-      }
-      else {
-        $sql = "INSERT INTO Student (Student_id, Fname, Lname, Mob_no, Dept, Year_of_study, Pwd) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_stmt_init($conn);
-        if(!mysqli_stmt_prepare($stmt, $sql)){
-          header("Location: ../signup.php?error=sqlerror");
-          exit();
-        }
-        else {
-
-          $hashedPwd = password_hash($password, PASSWORD_DEFAULT);
-
-          mysqli_stmt_bind_param($stmt, "sssssss",$roll, $fname, $lname, $mobile, $dept, $year, $hashedPwd);
-          mysqli_stmt_execute($stmt);
-          header("Location: ../index.php?signup=success");
-          exit();
-        }
-      }
     }
 
-  }
-  mysqli_stmt_close($stmt);
-  mysqli_close($conn);
+    // Check if roll number already exists
+    $stmt = $conn->prepare("SELECT id FROM students WHERE student_roll_no = ?");
+    $stmt->bind_param("s", $roll);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        header("Location: ../signup.php?error=userTaken");
+        exit();
+    }
 
+    // Hash password and insert
+    $hashed = password_hash($pwd, PASSWORD_DEFAULT);
+    $stmt = $conn->prepare("INSERT INTO students 
+        (student_fname, student_lname, student_roll_no, mobile_no, department, year_of_study, pwd)
+        VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $fname, $lname, $roll, $mobile, $dept, $year, $hashed);
+
+    if ($stmt->execute()) {
+        $_SESSION['roll']  = $roll;
+        $_SESSION['fname'] = $fname;
+        header("Location: ../home.php");
+        exit();
+    } else {
+        header("Location: ../signup.php?error=dbError");
+        exit();
+    }
 }
-else {
-  header("Location: ../signup.php");
-  exit();
-}
+
+header("Location: ../signup.php");
+exit();
+?>

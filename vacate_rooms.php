@@ -1,297 +1,138 @@
 <?php
-  require 'includes/config.inc.php';
+require 'includes/config.inc.php';
+if (!isset($_SESSION['manager'])) { header("Location: login-hostel_manager.php"); exit(); }
+ 
+$success = $error = '';
+$student = $room = null;
+ 
+// Pre-fill from URL param
+$prefill_roll = isset($_GET['roll']) ? trim($_GET['roll']) : '';
+$prefill_room = isset($_GET['room']) ? trim($_GET['room']) : '';
+ 
+// If room param given, find the student in it
+if ($prefill_room && !$prefill_roll) {
+    $s = $conn->prepare("SELECT student_roll_no FROM room_details WHERE room_no = ?");
+    $s->bind_param("s", $prefill_room); $s->execute();
+    $res = $s->get_result()->fetch_assoc();
+    if ($res) $prefill_roll = $res['student_roll_no'];
+}
+ 
+// Lookup student allocation
+if ($prefill_roll) {
+    $stmt = $conn->prepare("SELECT rd.*, s.student_fname, s.student_lname, s.department 
+                            FROM room_details rd JOIN students s ON rd.student_roll_no = s.student_roll_no 
+                            WHERE rd.student_roll_no = ?");
+    $stmt->bind_param("s", $prefill_roll); $stmt->execute();
+    $student = $stmt->get_result()->fetch_assoc();
+}
+ 
+if (isset($_POST['vacate-submit'])) {
+    $roll    = trim($_POST['student_roll_no']);
+    $room_no = trim($_POST['room_no']);
+ 
+    $del = $conn->prepare("DELETE FROM room_details WHERE student_roll_no = ?");
+    $del->bind_param("s", $roll); $del->execute();
+ 
+    $upd = $conn->prepare("UPDATE rooms SET room_status='empty' WHERE room_no = ?");
+    $upd->bind_param("s", $room_no); $upd->execute();
+ 
+    $success = "Room {$room_no} has been vacated successfully.";
+    $student = null;
+    $prefill_roll = '';
+}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title> Intrend Interior Category Flat Bootstrap Responsive Website Template | Services : W3layouts</title>
-	
-	<!-- Meta tag Keywords -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta charset="utf-8">
-	<meta name="keywords" content="Intrend Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
-	Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
-	<script type="application/x-javascript">
-		addEventListener("load", function () {
-			setTimeout(hideURLbar, 0);
-		}, false);
-
-		function hideURLbar() {
-			window.scrollTo(0, 1);
-		}
-	</script>
-	<!--bootsrap -->
-
-	<!--// Meta tag Keywords -->
-		
-	<!-- css files -->
-	<link rel="stylesheet" href="web_home/css_home/bootstrap.css"> <!-- Bootstrap-Core-CSS -->
-	<link rel="stylesheet" href="web_home/css_home/style.css" type="text/css" media="all" /> <!-- Style-CSS --> 
-	<link rel="stylesheet" href="web_home/css_home/fontawesome-all.css"> <!-- Font-Awesome-Icons-CSS -->
-	<!-- //css files -->
-	
-	<!-- web-fonts -->
-	<link href="//fonts.googleapis.com/css?family=Poiret+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
-	<link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
-	<!-- //web-fonts -->
-	
+  <title>Vacate Room — HostelEase</title>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="web/css/fontawesome-all.css" rel="stylesheet" />
+  <link href="web/css/style.css" rel="stylesheet" />
 </head>
-
 <body>
-
-<!-- banner -->
-<div class="inner-page-banner" id="home"> 	   
-	<!--Header-->
-	<header>
-		<div class="container agile-banner_nav">
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
-				
-				<h1><a class="navbar-brand" href="home.php">In <span class="display"> Trend</span></a></h1>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-				</button>
-
-				<div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-					<ul class="navbar-nav ml-auto">
-						<li class="nav-item">
-							<a class="nav-link" href="home_manager.php">Home <span class="sr-only">(current)</span></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="about_manager.php">About</a>
-						</li>
-						<li class="nav-item">
-						<a class="nav-link" href="allocate_room.php">Allocate Room</a>
-					<li class="dropdown nav-item">
-						<li class="nav-item">
-						<a class="nav-link" href="message_hostel_manager.php">Messages Received</a>
-					</li>
-						<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">Rooms
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu agile_short_dropdown">
-							<li>
-								<a href="allocated_rooms.php">Allocated Rooms</a>
-							</li>
-							<li>
-								<a href="empty_rooms.php">Empty Rooms</a>
-							</li>
-							<li>
-								<a href="vacate_rooms.php">Vacate Rooms</a>
-							</li>
-						</ul>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="contact.php">Contact</a>
-					</li>
-					<li class="dropdown nav-item">
-						<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown"><?php echo $_SESSION['username']; ?>
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu agile_short_dropdown">
-							<li>
-								<a href="profile.php">My Profile</a>
-							</li>
-							<li>
-								<a href="includes/logout.inc.php">Logout</a>
-							</li>
-						</ul>
-					</li>
-					</ul>
-				</div>
-			</nav>
-		</div>
-	</header>
-	<!--Header-->
+<div class="he-page">
+  <nav class="he-navbar">
+    <div class="he-brand"><div class="brand-icon"><i class="fas fa-home"></i></div>Hostel<span>Ease</span><span style="font-size:0.7rem;background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;margin-left:6px;">Warden</span></div>
+    <ul class="he-nav-links">
+      <li><a href="manager_home.php"><i class="fas fa-th-large" style="margin-right:5px"></i>Dashboard</a></li>
+      <li><a href="allocated_rooms.php"><i class="fas fa-door-closed" style="margin-right:5px"></i>Allocations</a></li>
+      <li><a href="empty_rooms.php"><i class="fas fa-door-open" style="margin-right:5px"></i>Empty Rooms</a></li>
+      <li><a href="allocate_room.php"><i class="fas fa-plus-circle" style="margin-right:5px"></i>Allocate Room</a></li>
+      <li><a href="message_hostel_manager.php"><i class="fas fa-envelope" style="margin-right:5px"></i>Messages</a></li>
+    </ul>
+    <div class="he-nav-user">
+      <div class="he-dropdown">
+        <div class="he-avatar"><i class="fas fa-user-shield"></i></div>
+        <div class="he-dropdown-menu">
+          <a href="includes/logout.inc.php"><i class="fas fa-sign-out-alt" style="margin-right:8px;color:var(--danger)"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+ 
+  <main class="he-main">
+    <p class="he-section-title">Vacate a Room</p>
+ 
+    <?php if($success): ?>
+      <div class="he-alert he-alert-success"><i class="fas fa-check-circle"></i><?php echo $success; ?> <a href="allocated_rooms.php">View all allocations →</a></div>
+    <?php endif; ?>
+    <?php if($error): ?>
+      <div class="he-alert he-alert-error"><i class="fas fa-exclamation-circle"></i><?php echo $error; ?></div>
+    <?php endif; ?>
+ 
+    <div style="max-width:600px;">
+      <!-- Search -->
+      <div class="he-card" style="margin-bottom:1.2rem;">
+        <h3 style="font-size:1rem;margin-bottom:1rem;">Find Student by Roll No</h3>
+        <form method="GET" style="display:flex;gap:0.8rem;">
+          <div class="he-input-wrap" style="flex:1;">
+            <i class="fas fa-search"></i>
+            <input type="text" name="roll" value="<?php echo htmlspecialchars($prefill_roll); ?>" placeholder="Enter student roll no" />
+          </div>
+          <button type="submit" class="he-btn he-btn-outline" style="white-space:nowrap;">
+            <i class="fas fa-search"></i> Find
+          </button>
+        </form>
+      </div>
+ 
+      <?php if($student): ?>
+      <!-- Student card -->
+      <div class="he-card" style="border:2px solid #fca5a5;">
+        <div class="he-profile-header" style="border-radius:var(--radius);margin:-1.6rem -1.6rem 1.2rem;">
+          <div class="he-profile-avatar"><?php echo strtoupper(substr($student['student_fname'],0,1)); ?></div>
+          <div>
+            <div class="he-profile-name"><?php echo htmlspecialchars($student['student_fname'].' '.$student['student_lname']); ?></div>
+            <div class="he-profile-sub"><?php echo htmlspecialchars($student['student_roll_no']); ?> &bull; <?php echo htmlspecialchars($student['department']); ?></div>
+          </div>
+        </div>
+        <div class="he-info-grid" style="margin-bottom:1.2rem;">
+          <div class="he-info-item"><label>Room No</label><p><?php echo htmlspecialchars($student['room_no']); ?></p></div>
+          <div class="he-info-item"><label>Hostel</label><p><?php echo htmlspecialchars($student['hostel_name']); ?></p></div>
+          <div class="he-info-item"><label>Room Type</label><p><?php echo htmlspecialchars($student['room_type']); ?></p></div>
+          <div class="he-info-item"><label>Allocated On</label><p><?php echo htmlspecialchars($student['allocation_date']); ?></p></div>
+        </div>
+        <div class="he-alert he-alert-warn" style="margin-bottom:1rem;">
+          <i class="fas fa-exclamation-triangle"></i> This will free up the room and remove the student's allocation.
+        </div>
+        <form method="POST">
+          <input type="hidden" name="student_roll_no" value="<?php echo htmlspecialchars($student['student_roll_no']); ?>" />
+          <input type="hidden" name="room_no" value="<?php echo htmlspecialchars($student['room_no']); ?>" />
+          <button type="submit" name="vacate-submit" class="he-btn he-btn-danger"
+                  onclick="return confirm('Are you sure you want to vacate this room?')">
+            <i class="fas fa-sign-out-alt"></i> Confirm Vacate Room
+          </button>
+        </form>
+      </div>
+      <?php elseif($prefill_roll && !$success): ?>
+      <div class="he-alert he-alert-error"><i class="fas fa-exclamation-circle"></i> No allocation found for this roll number.</div>
+      <?php endif; ?>
+    </div>
+  </main>
+ 
+  <footer class="he-footer">
+    <p>&copy; <?php echo date('Y'); ?> HostelEase — Administrative Management College, Bangalore.</p>
+  </footer>
 </div>
-
-<br><br><br>
-<?php
-   $hostel_id = $_SESSION['hostel_id'];
-   $query1 = "SELECT * FROM Hostel WHERE Hostel_id = '$hostel_id'";
-   $result1 = mysqli_query($conn,$query1);
-   $row1 = mysqli_fetch_assoc($result1);
-   $hostel_name = $row1['Hostel_name'];
-?>
-
-<section class="contact py-5">
-	<div class="container">
-		<h2 class="heading text-capitalize mb-sm-5 mb-4"> Vacate Form </h2>
-			<div class="mail_grid_w3l">
-				<form action="vacate_rooms.php" method="post">
-					<div class="row">
-						<div class="col-md-6 contact_left_grid" data-aos="fade-right">
-							<div class="contact-fields-w3ls">
-								<input type="text" name="roll_no" placeholder="Roll Number" required >
-							</div>
-							<div class="contact-fields-w3ls">
-								<input type="text" name="hostel" placeholder="Hostel" value="<?php echo $hostel_name;?>" required="" disabled="disabled">
-							</div>
-							<div class="contact-fields-w3ls">
-								<input type="number" name="room_no" placeholder="Room Number" required="">
-							</div>
-						</div>
-						<div class="col-md-6 contact_left_grid" data-aos="fade-left">
-							<input type="submit" name="submit" value="Click to Vacate">
-						</div>
-					</div>
-
-				</form>
-			</div>
-		
-	</div>
-</section>
-<?php
-if(isset($_POST['submit'])){
-     $roll = $_POST['roll_no'];
-     $hostel = $_POST['hostel'];
-     $room_number =(int)$_POST['room_no'];
-
-    $query2 = "SELECT * FROM Room WHERE Hostel_id = '$hostel_id' and Room_No = '$room_number'";
-    $result2 = mysqli_query($conn,$query2);
-    if(mysqli_num_rows($result2)==0){
-        echo "<script type='text/javascript'>alert('Incorrect Details')</script>";
-        exit();
-    }
-    $row2 = mysqli_fetch_assoc($result2);
-    if($row2['Allocated']=='0'){
-    	echo "<script type='text/javascript'>alert('Room Not Allocated')</script>";
-    	exit();
-    }
-    $room_id = (int)$row2['Room_id'];
-    /*echo "<script type='text/javascript'>alert('<?php echo $room_id ?>')</script>";*/
-	$query3 = "SELECT * FROM Student WHERE Student_id = '$roll' and Hostel_id = '$hostel_id' and Room_id = '$room_id'";
-	$result3 = mysqli_query($conn,$query3);
-    if(mysqli_num_rows($result3)==0){
-        echo "<script type='text/javascript'>alert('Incorrect Details 2')</script>";
-        exit();
-    }
-    $row3 = mysqli_fetch_assoc($result3);
-    if($result3){
-    	$query4 = "UPDATE Student SET Hostel_id = NULL, Room_id = NULL WHERE Student_id = '$roll'";
-    	$result4 = mysqli_query($conn,$query4);
-    	if($result4){
-    		$query5 = "UPDATE Room SET Allocated = '0' WHERE Room_id = '$room_id'";
-    		$result5 = mysqli_query($conn,$query5);
-    		if($result5){
-    			$query6 = "DELETE FROM Application WHERE Student_id = '$roll'";
-    			$result6 = mysqli_query($conn,$query6);
-    			if($result6){
-    			    echo "<script type='text/javascript'>alert('Vacated Successfully')</script>";	
-    			}
-    			
-    		}
-    	}
-    }
-}
-
-
-?>
-
-<br><br><br>
-
-<!-- footer -->
-<footer class="py-5">
-	<div class="container py-md-5">
-		<div class="footer-logo mb-5 text-center">
-			<a class="navbar-brand" href="index.html">In <span class="display"> Trend</span></a>
-		</div>
-		<div class="footer-grid">
-			<div class="social mb-4 text-center">
-				<ul class="d-flex justify-content-center">
-					<li class="mx-2"><a href="#"><span class="fab fa-facebook-f"></span></a></li>
-					<li class="mx-2"><a href="#"><span class="fab fa-twitter"></span></a></li>
-					<li class="mx-2"><a href="#"><span class="fas fa-rss"></span></a></li>
-					<li class="mx-2"><a href="#"><span class="fab fa-linkedin-in"></span></a></li>
-					<li class="mx-2"><a href="#"><span class="fab fa-google-plus"></span></a></li>
-				</ul>
-			</div>
-			<div class="list-footer">
-				<ul class="footer-nav text-center">
-					<li>
-						<a href="home_manager.php">Home</a>
-					</li>
-					<li>
-						<a href="about_manager.php">About</a>
-					</li>
-					<li>
-						<a href="services.php">Services</a>
-					</li>
-					<li>
-						<a href="projects.php">Gallery</a>
-					</li>
-					<li>
-						<a href="contact.php">Contact</a>
-					</li>
-				</ul>
-			</div>
-			<div class="agileits_w3layouts-copyright mt-4 text-center">
-				<p>© 2018 Intrend. All Rights Reserved | Design by <a href="http://w3layouts.com/" target="=_blank"> W3layouts </a></p>
-		</div>
-		</div>
-	</div>
-</footer>
-<!-- footer -->
-
-<!-- js-scripts -->
-
-	<!-- js -->
-	<script type="text/javascript" src="web_home/js/jquery-2.2.3.min.js"></script>
-	<script type="text/javascript" src="web_home/js/bootstrap.js"></script> <!-- Necessary-JavaScript-File-For-Bootstrap -->
-	<!-- //js -->
-
-	<!-- banner js -->
-	<script src="web_home/js/snap.svg-min.js"></script>
-	<script src="web_home/js/main.js"></script> <!-- Resource jQuery -->
-	<!-- //banner js -->
-
-	<!-- flexSlider --><!-- for testimonials -->
-	<script defer src="web_home/js/jquery.flexslider.js"></script>
-	<script type="text/javascript">
-		$(window).load(function(){
-		  $('.flexslider').flexslider({
-			animation: "slide",
-			start: function(slider){
-			  $('body').removeClass('loading');
-			}
-		  });
-		});
-	</script>
-	<!-- //flexSlider --><!-- for testimonials -->
-
-	<!-- start-smoth-scrolling -->
-	<script src="web_home/js/SmoothScroll.min.js"></script>
-	<script type="text/javascript" src="web_home/js/move-top.js"></script>
-	<script type="text/javascript" src="web_home/js/easing.js"></script>
-	<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			$(".scroll").click(function(event){
-				event.preventDefault();
-				$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
-			});
-		});
-	</script>
-	<!-- here stars scrolling icon -->
-	<script type="text/javascript">
-		$(document).ready(function() {
-			/*
-				var defaults = {
-				containerID: 'toTop', // fading element id
-				containerHoverID: 'toTopHover', // fading element hover id
-				scrollSpeed: 1200,
-				easingType: 'linear'
-				};
-			*/
-
-			$().UItoTop({ easingType: 'easeOutQuart' });
-
-			});
-	</script>
-	<!-- //here ends scrolling icon -->
-	<!-- start-smoth-scrolling -->
-
-<!-- //js-scripts -->
-
 </body>
 </html>
-

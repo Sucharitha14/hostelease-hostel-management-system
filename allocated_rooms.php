@@ -1,321 +1,112 @@
 <?php
-  require 'includes/config.inc.php';
-  
-?>
+require 'includes/config.inc.php';
+if (!isset($_SESSION['manager'])) { header("Location: login-hostel_manager.php"); exit(); }
 
+$rows = $conn->query("SELECT rd.*, s.student_fname, s.student_lname, s.mobile_no, s.department 
+                      FROM room_details rd 
+                      JOIN students s ON rd.student_roll_no = s.student_roll_no 
+                      ORDER BY rd.allocation_date DESC");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title> Allocated Rooms</title>
-	
-	<!-- Meta tag Keywords -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta charset="utf-8">
-	<meta name="keywords" content="Intrend Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
-	Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
-	<script type="application/x-javascript">
-		addEventListener("load", function () {
-			setTimeout(hideURLbar, 0);
-		}, false);
-
-		function hideURLbar() {
-			window.scrollTo(0, 1);
-		}
-	</script>
-	<!--bootsrap -->
-
-	<!--// Meta tag Keywords -->
-		
-	<!-- css files -->
-	<link rel="stylesheet" href="web_home/css_home/bootstrap.css"> <!-- Bootstrap-Core-CSS -->
-	<link rel="stylesheet" href="web_home/css_home/style.css" type="text/css" media="all" /> <!-- Style-CSS --> 
-	<link rel="stylesheet" href="web_home/css_home/fontawesome-all.css"> <!-- Font-Awesome-Icons-CSS -->
-	<!-- //css files -->
-	
-	<!-- web-fonts -->
-	<link href="//fonts.googleapis.com/css?family=Poiret+One&amp;subset=cyrillic,latin-ext" rel="stylesheet">
-	<link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
-	<!-- //web-fonts -->
-	
+  <title>Allocated Rooms — HostelEase</title>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="web/css/fontawesome-all.css" rel="stylesheet" />
+  <link href="web/css/style.css" rel="stylesheet" />
+  <style>
+    .search-bar { display:flex; gap:1rem; margin-bottom:1.2rem; }
+    .search-bar input { flex:1; padding:0.6rem 1rem; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-body); font-size:0.9rem; outline:none; }
+    .search-bar input:focus { border-color:var(--primary); }
+  </style>
 </head>
-
 <body>
+<div class="he-page">
+  <nav class="he-navbar">
+    <div class="he-brand"><div class="brand-icon"><i class="fas fa-home"></i></div>Hostel<span>Ease</span><span style="font-size:0.7rem;background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;margin-left:6px;">Warden</span></div>
+    <ul class="he-nav-links">
+      <li><a href="manager_home.php"><i class="fas fa-th-large" style="margin-right:5px"></i>Dashboard</a></li>
+      <li><a href="allocated_rooms.php" class="active"><i class="fas fa-door-closed" style="margin-right:5px"></i>Allocations</a></li>
+      <li><a href="empty_rooms.php"><i class="fas fa-door-open" style="margin-right:5px"></i>Empty Rooms</a></li>
+      <li><a href="allocate_room.php"><i class="fas fa-plus-circle" style="margin-right:5px"></i>Allocate Room</a></li>
+      <li><a href="message_hostel_manager.php"><i class="fas fa-envelope" style="margin-right:5px"></i>Messages</a></li>
+    </ul>
+    <div class="he-nav-user">
+      <div class="he-dropdown">
+        <div class="he-avatar"><i class="fas fa-user-shield"></i></div>
+        <div class="he-dropdown-menu">
+          <a href="includes/logout.inc.php"><i class="fas fa-sign-out-alt" style="margin-right:8px;color:var(--danger)"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-<!-- banner -->
-<div class="inner-page-banner" id="home"> 	   
-	<!--Header-->
-	<header>
-		<div class="container agile-banner_nav">
-			<nav class="navbar navbar-expand-lg navbar-light bg-light">
-				
-				<h1><a class="navbar-brand" href="home_manager.php">NITC <span class="display"></span></a></h1>
-				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-				</button>
+  <main class="he-main">
+    <p class="he-section-title">All Allocated Rooms</p>
 
-				<div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-					<ul class="navbar-nav ml-auto">
-						<li class="nav-item">
-							<a class="nav-link" href="home_manager.php">Home <span class="sr-only">(current)</span></a>
-						</li>
-						
-						<li class="nav-item">
-						<a class="nav-link" href="allocate_room.php">Allocate Room</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="message_hostel_manager.php">Messages Received</a>
-					</li>
-					<li class="dropdown nav-item">
-						<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">Rooms
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu agile_short_dropdown">
-							<li>
-								<a href="allocated_rooms.php">Allocated Rooms</a>
-							</li>
-							<li>
-								<a href="empty_rooms.php">Empty Rooms</a>
-							</li>
-							<li>
-								<a href="vacate_rooms.php">Vacate Rooms</a>
-							</li>
-						</ul>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="contact_manager.php">Contact</a>
-					</li>
-					<li class="dropdown nav-item">
-						<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown"><?php echo $_SESSION['username']; ?>
-							<b class="caret"></b>
-						</a>
-						<ul class="dropdown-menu agile_short_dropdown">
-							<li>
-								<a href="admin/manager_profile.php">My Profile</a>
-							</li>
-							<li>
-								<a href="includes/logout.inc.php">Logout</a>
-							</li>
-						</ul>
-					</li>
-					</ul>
-				</div>
-			</nav>
-		</div>
-	</header>
-	<!--Header-->
+    <div class="he-card">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍  Search by name, roll no, room or department..." onkeyup="filterTable()" />
+      </div>
+      <div class="he-table-wrap">
+        <table class="he-table" id="allocTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student</th>
+              <th>Roll No</th>
+              <th>Department</th>
+              <th>Mobile</th>
+              <th>Room</th>
+              <th>Hostel</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if($rows && $rows->num_rows > 0): $i=1;
+              while($row = $rows->fetch_assoc()): ?>
+            <tr>
+              <td><?php echo $i++; ?></td>
+              <td><strong><?php echo htmlspecialchars($row['student_fname'].' '.$row['student_lname']); ?></strong></td>
+              <td><span class="he-badge he-badge-pink"><?php echo htmlspecialchars($row['student_roll_no']); ?></span></td>
+              <td><?php echo htmlspecialchars($row['department']); ?></td>
+              <td><?php echo htmlspecialchars($row['mobile_no']); ?></td>
+              <td><span class="he-badge he-badge-purple"><?php echo htmlspecialchars($row['room_no']); ?></span></td>
+              <td><?php echo htmlspecialchars($row['hostel_name']); ?></td>
+              <td><?php echo htmlspecialchars($row['room_type']); ?></td>
+              <td><?php echo htmlspecialchars($row['allocation_date']); ?></td>
+              <td>
+                <a href="vacate_rooms.php?roll=<?php echo urlencode($row['student_roll_no']); ?>"
+                   class="he-btn he-btn-danger he-btn-sm"
+                   onclick="return confirm('Vacate room for <?php echo htmlspecialchars($row['student_fname']); ?>?')">
+                  <i class="fas fa-sign-out-alt"></i> Vacate
+                </a>
+              </td>
+            </tr>
+            <?php endwhile; else: ?>
+            <tr><td colspan="10" style="text-align:center;color:var(--text-light);padding:2rem;">No rooms allocated yet. <a href="allocate_room.php">Allocate one →</a></td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="he-footer">
+    <p>&copy; <?php echo date('Y'); ?> HostelEase — Administrative Management College, Bangalore.</p>
+  </footer>
 </div>
-<!-- //banner --> 
-<br><br><br>
-
-<section class="contact py-5">
-	<div class="container">
-			<div class="mail_grid_w3l">
-				<form action="allocated_rooms.php" method="post">
-					<div class="row">
-					        <div class="col-md-9"> 
-							<input type="text" placeholder="Search by Roll Number" name="search_box">
-							</div>
-							<div class="col-md-3">
-							<input type="submit" value="Search" name="search"></input>
-							</div>
-					</div>
-				</form>
-			</div>
-	</div>
-</section>
-<?php
-   if (isset($_POST['search'])) {
-   	   $search_box = $_POST['search_box'];
-   	   /*echo "<script type='text/javascript'>alert('<?php echo $search_box; ?>')</script>";*/
-   	   $hostel_id = $_SESSION['hostel_id'];
-   	   $query_search = "SELECT * FROM Student WHERE Student_id like '$search_box%' and Hostel_id = '$hostel_id'";
-   	   $result_search = mysqli_query($conn,$query_search);
-
-   	   //select the hostel name from hostel table
-       $query6 = "SELECT * FROM Hostel WHERE Hostel_id = '$hostel_id'";
-       $result6 = mysqli_query($conn,$query6);
-       $row6 = mysqli_fetch_assoc($result6);
-       $hostel_name = $row6['Hostel_name'];
-   	   ?>
-   	   <div class="container">
-   	   <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Student Name</th>
-        <th>Student ID</th>
-        <th>Contact Number</th> 
-        <th>Hostel</th>
-        <th>Room Number</th>
-      </tr>
-    </thead>
-    <tbody>
-    <?php
-   	   if(mysqli_num_rows($result_search)==0){
-   	   	  echo '<tr><td colspan="4">No Rows Returned</td></tr>';
-   	   }
-   	   else{
-   	   	  while($row_search = mysqli_fetch_assoc($result_search)){
-      		//get the name of the student to display
-            $room_id = $row_search['Room_id']; 
-            $query7 = "SELECT * FROM Room WHERE Room_id = '$room_id'";
-            $result7 = mysqli_query($conn,$query7);
-            $row7 = mysqli_fetch_assoc($result7);
-            $room_no = $row7['Room_No'];
-            //student name
-            $student_name = $row_search['Fname']." ".$row_search['Lname'];
-            
-      		echo "<tr><td>{$student_name}</td><td>{$row_search['Student_id']}</td><td>{$row_search['Mob_no']}</td><td>{$hostel_name}</td><td>{$room_no}</td></tr>\n";
-   	   }
-   }
-   ?>
-   </tbody>
-  </table>
-</div>
-<?php
+<script>
+function filterTable() {
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const rows  = document.querySelectorAll('#allocTable tbody tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(input) ? '' : 'none';
+  });
 }
-  ?>
-
-
-<div class="container">
-<h2 class="heading text-capitalize mb-sm-5 mb-4"> Rooms Allotted </h2>
-<?php
-   $hostel_id = $_SESSION['hostel_id'];
-   $query1 = "SELECT * FROM Student where Hostel_id = '$hostel_id'";
-   $result1 = mysqli_query($conn,$query1);
-   //select the hostel name from hostel table
-   $query6 = "SELECT * FROM Hostel WHERE Hostel_id = '$hostel_id'";
-   $result6 = mysqli_query($conn,$query6);
-   $row6 = mysqli_fetch_assoc($result6);
-   $hostel_name = $row6['Hostel_name'];
-
-
-?>
-        
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Student Name</th>
-        <th>Student ID</th>
-        <th>Contact Number</th> 
-        <th>Hostel</th>
-        <th>Room Number</th>
-      </tr>
-    </thead>
-    <tbody>
-    <?php
-      if(mysqli_num_rows($result1)==0){
-         echo '<tr><td colspan="4">No Rows Returned</td></tr>';
-      }
-      else{
-      	while($row1 = mysqli_fetch_assoc($result1)){
-      		//get the room_no of the student from room_id in room table
-            $room_id = $row1['Room_id']; 
-            $query7 = "SELECT * FROM Room WHERE Room_id = '$room_id'";
-            $result7 = mysqli_query($conn,$query7);
-            $row7 = mysqli_fetch_assoc($result7);
-            $room_no = $row7['Room_No'];
-            //student name
-            $student_name = $row1['Fname']." ".$row1['Lname'];
-            
-      		echo "<tr><td>{$student_name}</td><td>{$row1['Student_id']}</td><td>{$row1['Mob_no']}</td><td>{$hostel_name}</td><td>{$room_no}</td></tr>\n";
-      	}
-      }
-    ?>
-    </tbody>
-  </table>
-</div>
-<br>
-<br>
-<br>
-
-<!-- footer -->
-<footer class="py-5">
-	<div class="container py-md-5">
-		<div class="footer-logo mb-5 text-center">
-			<a class="navbar-brand" href="http://www.nitc.ac.in/" target="_blank">NIT <span class="display"> CALICUT</span></a>
-		</div>
-		<div class="footer-grid">
-			<div class="list-footer">
-				<ul class="footer-nav text-center">
-					<li>
-						<a href="home_manager.php">Home</a>
-					</li>
-					<li>
-						<a href="allocate_room.php">Allocate</a>
-					</li>
-					<li>
-						<a href="contact_manager.php">Contact</a>
-					</li>
-					<li>
-						<a href="admin/manager_profile.php">Profile</a>
-					</li>
-				</ul>
-			</div>
-			
-		</div>
-	</div>
-</footer>
-<!-- footer -->
-
-<!-- js-scripts -->
-
-	<!-- js -->
-	<script type="text/javascript" src="web_home/js/jquery-2.2.3.min.js"></script>
-	<script type="text/javascript" src="web_home/js/bootstrap.js"></script> <!-- Necessary-JavaScript-File-For-Bootstrap -->
-	<!-- //js -->
-
-	<!-- banner js -->
-	<script src="web_home/js/snap.svg-min.js"></script>
-	<script src="web_home/js/main.js"></script> <!-- Resource jQuery -->
-	<!-- //banner js -->
-
-	<!-- flexSlider --><!-- for testimonials -->
-	<script defer src="web_home/js/jquery.flexslider.js"></script>
-	<script type="text/javascript">
-		$(window).load(function(){
-		  $('.flexslider').flexslider({
-			animation: "slide",
-			start: function(slider){
-			  $('body').removeClass('loading');
-			}
-		  });
-		});
-	</script>
-	<!-- //flexSlider --><!-- for testimonials -->
-
-	<!-- start-smoth-scrolling -->
-	<script src="web_home/js/SmoothScroll.min.js"></script>
-	<script type="text/javascript" src="web_home/js/move-top.js"></script>
-	<script type="text/javascript" src="web_home/js/easing.js"></script>
-	<script type="text/javascript">
-		jQuery(document).ready(function($) {
-			$(".scroll").click(function(event){
-				event.preventDefault();
-				$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
-			});
-		});
-	</script>
-	<!-- here stars scrolling icon -->
-	<script type="text/javascript">
-		$(document).ready(function() {
-			/*
-				var defaults = {
-				containerID: 'toTop', // fading element id
-				containerHoverID: 'toTopHover', // fading element hover id
-				scrollSpeed: 1200,
-				easingType: 'linear'
-				};
-			*/
-
-			$().UItoTop({ easingType: 'easeOutQuart' });
-
-			});
-	</script>
-	<!-- //here ends scrolling icon -->
-	<!-- start-smoth-scrolling -->
-
-<!-- //js-scripts -->
-
+</script>
 </body>
 </html>
-
